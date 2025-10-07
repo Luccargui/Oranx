@@ -33,12 +33,12 @@ comments.src= "./media/comments.png";
 numberOfComments.textContent = naranjito.comentarios.length;
 likes.src = "./media/empty_heart.png";
 numberOfLikes.textContent = naranjito.likes;
-renaranjear.src = "./media/renaranjear.png";
-numberOfRenaranjeos.textContent = naranjito.retweets;
 divInfo.className = "info";
 
 likes.addEventListener("click", (e) => darLike(e.target, numberOfLikes, naranjito));
-
+comments.addEventListener("click", (e) => {
+  toggleComentarios(e.target, naranjito, divNaranjito);
+});
 //añadir los elementos al html
 divUser.appendChild(imgUser);
 divUser.appendChild(userName);
@@ -47,11 +47,8 @@ divComments.appendChild(comments);
 divComments.appendChild(numberOfComments);
 divLikes.appendChild(likes);
 divLikes.appendChild(numberOfLikes);
-divRenaranjeo.appendChild(renaranjear);
-divRenaranjeo.appendChild(numberOfRenaranjeos);
 divInfo.appendChild(divComments);
 divInfo.appendChild(divLikes);
-divInfo.appendChild(divRenaranjeo);
 divNaranjito.appendChild(divUser);
 divNaranjito.appendChild(textNaranjito);
 divNaranjito.appendChild(divInfo);
@@ -103,7 +100,6 @@ const postNaranjito = (input) => {
       arroba: USER.arroba,
     },
     likes: 0,
-    retweets: 0,
     comentarios: []
   };
   input.value= "";
@@ -196,27 +192,23 @@ NARANJITOS = [
        texto: "La inteligencia artificial cambiará la forma en que trabajamos en los próximos 5 años 🤖",
      user: users[0],
     likes: 231,
-    retweets: 54,
     comentarios: []
   },
   {
     texto: "Aprender a programar debería enseñarse desde primaria. 💡",
     user:users[1],
     likes: 187,
-    retweets: 40,
     comentarios: []
   },
   {
     texto: "No hay nada mejor que un café ☕ y VS Code en la madrugada.",
     user:users[2],
     likes: 92,
-    retweets: 12,
     comentarios: [
       {
         texto: "Pero luego el bug te quita el sueño 😅",
         user: users[8],
         likes: 34,
-        retweets: 2,
         comentarios: []
       }
     ]
@@ -225,52 +217,91 @@ NARANJITOS = [
     texto: "Estoy probando Rust y me está volando la cabeza. 🦀",
     user: users[3],
     likes: 115,
-    retweets: 21,
     comentarios: []
   },
   {
     texto: "Si no entiendes algo, explícaselo a otra persona. Funciona el 90% de las veces. 🎯",
     user: users[4],
     likes: 301,
-    retweets: 67,
     comentarios: []
   },
   {
     texto: "Tailwind me ahorra horas de CSS, no pienso volver atrás 💙",
     user: users[5],
     likes: 144,
-    retweets: 18,
-    comentarios: [
-      {
-        texto: "Yo aún soy team CSS puro ✌️",
-        user: {
-          nombre: "Andrea López",
-          arroba: "@andreaCSS",
-          imagen: "./media/femenino_trenza.png"
-        },
-        likes: 28,
-        retweets: 1,
-        comentarios: []
-      }
-    ]
+    comentarios: []
   },
   {
     texto: "¿Soy el único que disfruta debuggear más que programar? 🐛",
     user: users[6],
     likes: 67,
-    retweets: 5,
     comentarios: []
   },
   {
     texto: "Los side projects son la mejor manera de aprender cosas nuevas 🚀",
     user: users[7],
     likes: 210,
-    retweets: 34,
     comentarios: []
   },
 ];
  printNaranjitos(NARANJITOS);
 }
+
+const toggleComentarios = (icono, naranjito, divPadre) => {
+  // Si ya existe un contenedor de comentarios, lo eliminamos (toggle)
+  const existingComments = document.querySelector(".comentarios-container");
+  if (existingComments) {
+    existingComments.remove();
+    return;
+  }
+
+  // Crear contenedor de comentarios
+  const commentsContainer = document.createElement("div");
+  commentsContainer.classList.add("comentarios-container");
+
+
+
+  // Mostrar los comentarios del naranjito
+  if (naranjito.comentarios.length === 0) {
+    const noComments = document.createElement("p");
+    noComments.textContent = "No hay comentarios todavía 🍊";
+    noComments.style.fontStyle = "italic";
+    commentsContainer.appendChild(noComments);
+  } else {
+    // Reutilizamos la lógica de printNaranjitos, pero para los comentarios
+    for (const comentario of naranjito.comentarios) {
+      const divComentario = document.createElement("div");
+      divComentario.classList.add("naranjito-comentario");
+    
+      const divInfoComentarista = document.createElement("div");
+
+      const imgUser = document.createElement("img");
+      imgUser.src = comentario.user.imagen;
+
+
+      const nombre = document.createElement("h3");
+      nombre.textContent = comentario.user.nombre;
+      
+      const arrobaComentarista = document.createElement("p");
+      arrobaComentarista.textContent = comentario.user.arroba;
+
+      const texto = document.createElement("p");
+      texto.textContent = comentario.texto;
+
+      divComentario.appendChild(divInfoComentarista);
+      divInfoComentarista.appendChild(imgUser);
+      divInfoComentarista.appendChild(nombre);
+      divInfoComentarista.appendChild(arrobaComentarista);
+      divComentario.appendChild(texto);
+
+      commentsContainer.appendChild(divComentario);
+    }
+  }
+
+  // Insertar el contenedor justo debajo del naranjito padre
+  divPadre.insertAdjacentElement("afterend", commentsContainer);
+};
+
 
 
 init();
